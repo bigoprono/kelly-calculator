@@ -337,27 +337,22 @@ function calculer() {
   const q = 1 - p;
 
   const kellyPct  = Math.max(0, (b * p - q) / b) * 100;
-  const demiPct   = kellyPct / 2;
   const quartPct  = kellyPct / 4;
   const capPct    = plafond(cote);
   const finalPct  = Math.min(quartPct, capPct);
   const capped    = quartPct > capPct;
 
-  const mise      = (finalPct / 100) * bankroll;
-  const gain      = mise * b;
+  const mise = (finalPct / 100) * bankroll;
+  const gain = mise * b;
 
   document.getElementById('mise-amount').textContent = mise.toFixed(2);
   document.getElementById('mise-pct').textContent    = finalPct.toFixed(2) + '%';
-  document.getElementById('kelly-full').textContent  = (kellyPct / 100 * bankroll).toFixed(2) + '€';
-  document.getElementById('kelly-half').textContent  = (demiPct / 100 * bankroll).toFixed(2) + '€';
   document.getElementById('gain').textContent        = '+' + gain.toFixed(2) + '€';
-  document.getElementById('plafond').textContent     = capPct + '% max';
 
-  const evBar = Math.min(ev * 3, 100);
-  document.getElementById('ev-fill').style.width = evBar + '%';
+  document.getElementById('ev-fill').style.width = Math.min(ev * 3, 100) + '%';
 
-  const capLabel  = document.getElementById('cap-label');
-  const warning   = document.getElementById('warning');
+  const capLabel = document.getElementById('cap-label');
+  const warning  = document.getElementById('warning');
 
   if (capped) {
     capLabel.innerHTML = '<span class="cap-badge">PLAFOND</span>';
