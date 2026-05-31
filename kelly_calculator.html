@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculatrice Quart-Kelly</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.1);
+    --red: #ff3355;
+    --amber: #ffaa00;
+    --text: #f0f0f0;
+    --muted: #555;
+    --font-mono: 'Space Mono', monospace;
+    --font-display: 'Bebas Neue', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-mono);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .header {
+    background: var(--green);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: #000;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .header-sub {
+    font-size: 9px;
+    color: rgba(0,0,0,0.6);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .header-icon {
+    font-size: 32px;
+  }
+
+  .body { padding: 24px; }
+
+  .field { margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus { border-color: var(--green); }
+  input::placeholder { color: var(--muted); font-size: 14px; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .btn {
+    width: 100%;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 2px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 3px;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover { opacity: 0.85; }
+
+  .result {
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .result.show { display: block; }
+
+  .result-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-body { padding: 16px; }
+
+  .result-main {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .result-amount {
+    font-family: var(--font-display);
+    font-size: 48px;
+    line-height: 1;
+    color: var(--green);
+  }
+
+  .result-currency {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--green);
+    opacity: 0.7;
+  }
+
+  .result-pct {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .result-pct span {
+    display: block;
+    font-size: 20px;
+    color: var(--text);
+    font-family: var(--font-display);
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .stat {
+    background: var(--surface2);
+    border-radius: 2px;
+    padding: 10px 12px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-family: var(--font-display);
+    letter-spacing: 1px;
+  }
+
+  .warning {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(255,170,0,0.08);
+    border: 1px solid rgba(255,170,0,0.3);
+    border-radius: 2px;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .warning.show { display: block; }
+
+  .cap-badge {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .footer {
+    padding: 12px 24px;
+    border-top: 1px solid var(--border);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .ev-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .ev-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="header-title">QUART-KELLY</div>
+      <div class="header-sub">Calculatrice de mise</div>
+    </div>
+    <div class="header-icon">🧮</div>
+  </div>
+
+  <div class="body">
+    <div class="field">
+      <label>Bankroll (€)</label>
+      <input type="number" id="bankroll" placeholder="Ex: 1000" min="1" step="1">
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Cote soft</label>
+        <input type="number" id="cote" placeholder="Ex: 2.10" min="1.01" step="0.01">
+      </div>
+      <div class="field">
+        <label>EV (%)</label>
+        <input type="number" id="ev" placeholder="Ex: 7.5" min="0" step="0.1">
+      </div>
+    </div>
+
+    <button class="btn" onclick="calculer()">CALCULER</button>
+
+    <div class="result" id="result">
+      <div class="result-header">
+        MISE RECOMMANDÉE <span id="cap-label"></span>
+      </div>
+      <div class="result-body">
+        <div class="result-main">
+          <div class="result-amount" id="mise-amount">0</div>
+          <div class="result-currency">€</div>
+          <div class="result-pct">
+            <span id="mise-pct">0%</span>
+            de bankroll
+          </div>
+        </div>
+
+        <div class="ev-bar">
+          <div class="ev-fill" id="ev-fill" style="width:0%"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stats">
+  <div class="stat" style="grid-column: 1 / -1;">
+    <div class="stat-label">Gain potentiel</div>
+    <div class="stat-value" id="gain">—</div>
+  </div>
+</div>
+
+        <div class="warning" id="warning"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">QUART-KELLY · PLAFOND AUTO · VALUE BETTING</div>
+</div>
+
+<script>
+function plafond(cote) {
+  if (cote <= 2.50) return 3.0;
+  if (cote <= 4.00) return 2.0;
+  if (cote <= 7.00) return 1.0;
+  return 0.5;
+}
+
+function calculer() {
+  const bankroll = parseFloat(document.getElementById('bankroll').value);
+  const cote     = parseFloat(document.getElementById('cote').value);
+  const ev       = parseFloat(document.getElementById('ev').value);
+
+  if (!bankroll || !cote || !ev || cote <= 1 || ev <= 0) return;
+
+  const b = cote - 1;
+  const p = (ev / 100 + 1) / cote;
+  const q = 1 - p;
+
+  const kellyPct  = Math.max(0, (b * p - q) / b) * 100;
+  const demiPct   = kellyPct / 2;
+  const quartPct  = kellyPct / 4;
+  const capPct    = plafond(cote);
+  const finalPct  = Math.min(quartPct, capPct);
+  const capped    = quartPct > capPct;
+
+  const mise      = (finalPct / 100) * bankroll;
+  const gain      = mise * b;
+
+  document.getElementById('mise-amount').textContent = mise.toFixed(2);
+  document.getElementById('mise-pct').textContent    = finalPct.toFixed(2) + '%';
+  document.getElementById('kelly-full').textContent  = (kellyPct / 100 * bankroll).toFixed(2) + '€';
+  document.getElementById('kelly-half').textContent  = (demiPct / 100 * bankroll).toFixed(2) + '€';
+  document.getElementById('gain').textContent        = '+' + gain.toFixed(2) + '€';
+  document.getElementById('plafond').textContent     = capPct + '% max';
+
+  const evBar = Math.min(ev * 3, 100);
+  document.getElementById('ev-fill').style.width = evBar + '%';
+
+  const capLabel  = document.getElementById('cap-label');
+  const warning   = document.getElementById('warning');
+
+  if (capped) {
+    capLabel.innerHTML = '<span class="cap-badge">PLAFOND</span>';
+    warning.className  = 'warning show';
+    warning.textContent = '⚠ Quart-Kelly (' + (quartPct / 100 * bankroll).toFixed(2) + '€) dépasse le plafond de ' + capPct + '% pour une cote à ' + cote + '. Mise réduite au plafond.';
+  } else {
+    capLabel.innerHTML = '';
+    warning.className  = 'warning';
+  }
+
+  document.getElementById('result').className = 'result show';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') calculer(); });
+</script>
+</body>
+</html>
