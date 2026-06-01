@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculatrice Quart-Kelly</title>
+<title>Calculatrice Demi-Kelly</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -257,7 +257,7 @@
 <div class="card">
   <div class="header">
     <div>
-      <div class="header-title">QUART-KELLY</div>
+      <div class="header-title">DEMI-KELLY</div>
       <div class="header-sub">Calculatrice de mise</div>
     </div>
     <div class="header-icon">🧮</div>
@@ -303,18 +303,18 @@
         <div class="divider"></div>
 
         <div class="stats">
-  <div class="stat" style="grid-column: 1 / -1;">
-    <div class="stat-label">Gain potentiel</div>
-    <div class="stat-value" id="gain">—</div>
-  </div>
-</div>
+          <div class="stat" style="grid-column: 1 / -1;">
+            <div class="stat-label">Gain potentiel</div>
+            <div class="stat-value" id="gain">—</div>
+          </div>
+        </div>
 
         <div class="warning" id="warning"></div>
       </div>
     </div>
   </div>
 
-  <div class="footer">QUART-KELLY · PLAFOND AUTO · VALUE BETTING</div>
+  <div class="footer">DEMI-KELLY · PLAFOND AUTO · VALUE BETTING</div>
 </div>
 
 <script>
@@ -336,11 +336,11 @@ function calculer() {
   const p = (ev / 100 + 1) / cote;
   const q = 1 - p;
 
-  const kellyPct  = Math.max(0, (b * p - q) / b) * 100;
-  const quartPct  = kellyPct / 4;
-  const capPct    = plafond(cote);
-  const finalPct  = Math.min(quartPct, capPct);
-  const capped    = quartPct > capPct;
+  const kellyPct = Math.max(0, (b * p - q) / b) * 100;
+  const demiPct  = kellyPct / 2;
+  const capPct   = plafond(cote);
+  const finalPct = Math.min(demiPct, capPct);
+  const capped   = demiPct > capPct;
 
   const mise = (finalPct / 100) * bankroll;
   const gain = mise * b;
@@ -357,7 +357,7 @@ function calculer() {
   if (capped) {
     capLabel.innerHTML = '<span class="cap-badge">PLAFOND</span>';
     warning.className  = 'warning show';
-    warning.textContent = '⚠ Quart-Kelly (' + (quartPct / 100 * bankroll).toFixed(2) + '€) dépasse le plafond de ' + capPct + '% pour une cote à ' + cote + '. Mise réduite au plafond.';
+    warning.textContent = '⚠ Demi-Kelly (' + (demiPct / 100 * bankroll).toFixed(2) + '€) dépasse le plafond de ' + capPct + '% pour une cote à ' + cote + '. Mise réduite au plafond.';
   } else {
     capLabel.innerHTML = '';
     warning.className  = 'warning';
